@@ -1,0 +1,4 @@
+virtualenv
+.vscode
+*.csv 
+.DS_Store
