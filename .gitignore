@@ -2,3 +2,5 @@ virtualenv
 .vscode
 *.csv 
 .DS_Store
+.Rproj.user
+*.Rproj
