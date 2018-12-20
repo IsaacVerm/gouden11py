@@ -1,0 +1,85 @@
+---
+title: "Optimal selection players Gouden 11"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Goal
+
+Find an optimal selection of players for Gouden 11. We'll have a look at the most valuable players and then see if these have any characteristics we can exploit. E.g. maybe all the most valuable players are in top teams, that would drastically reduce the number of options to choose from and make a selection strategy choosing players at random from top teams possible.
+
+We'll also compare this optimal selection to the selection chosen by real users.
+
+```{r setup}
+# packages
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+
+# load data
+players <- read.csv(file = "players.csv", as.is = (c("name")))
+```
+
+
+```{r wrangling }
+players <- players %>% 
+  mutate(roi = points/value) # calculate roi
+```
+
+# Restrictions
+
+Players score points for goals scored, clean sheets, ... Read the [rules](https://gouden11.hln.be/gouden-g11/rules) if you want the details. 
+
+The restrictions:
+
+* select 15 players (11 starting squad, 4 replacements)
+* each game you can swap players between the starting squad and replacements
+* max total value of 250M
+* max 2 players of the same team
+* use one of the predefined formations
+* one of the starting players is a captain scoring 1.5 times the number of points
+* 6 total transfers can be made over the entire season
+
+Of these restrictions the following are variable:
+
+* choice of captain
+* transfers
+* making replacements
+
+Since complications arise out of those variable restrictions we won't focus on them in a preliminary analysis.
+
+# Most valuable players
+
+The restrictions make clear there are 3 main factors for us to take into account:
+
+* value (max of 250M)
+* position (max of x players in position y depending on formation)
+* club (max 2 players of the same team)
+
+The problem with the formations is they are not explicitly defined in the rules. The best way to find out what formations are possible is to have a look at the formations used by existing players.
+
+Regarding solutions, this looks like a lineair programming problem but let's first try to handle this manually.
+
+## Focus on
+
+Only top 20 players within each position.
+
+```{r}
+top_20_players <- players %>%
+  group_by(position_id) %>% # group id has to be calculated by position
+  arrange(desc(roi)) %>% 
+  top_n(20, roi) %>% # only interested in top 20 players by position
+  mutate(group_id = 1:n()) # add unique id within each group of positions
+
+ggplot(data = top_20_players,
+       aes(x = group_id,
+           y = roi,
+           fill = club_name)) +
+  geom_col() +
+  ggpubr::rremove("x.text") +
+  ggpubr::rremove("x.title") +
+  facet_grid(. ~ position_id)
+  
+```
+

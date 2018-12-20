@@ -6,3 +6,5 @@ virtualenv
 *.Rproj
 packrat*
 !packrat.lock
+packrat/lib*/
+.Rhistory
