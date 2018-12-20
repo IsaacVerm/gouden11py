@@ -12,6 +12,9 @@ Find an optimal selection of players for Gouden 11. We'll have a look at the mos
 We'll also compare this optimal selection to the selection chosen by real users.
 
 ```{r setup}
+# clean environment
+rm(list = ls())
+
 # packages
 library(ggplot2)
 library(dplyr)
@@ -19,6 +22,7 @@ library(ggpubr)
 
 # load data
 players <- read.csv(file = "players.csv", as.is = (c("name")))
+formations_used <- read.csv(file = "formations_used_top_100_users.csv", header = FALSE)
 ```
 
 
@@ -29,9 +33,11 @@ players <- players %>%
 
 # Restrictions
 
+## How to score points
+
 Players score points for goals scored, clean sheets, ... Read the [rules](https://gouden11.hln.be/gouden-g11/rules) if you want the details. 
 
-The restrictions:
+## The restrictions
 
 * select 15 players (11 starting squad, 4 replacements)
 * each game you can swap players between the starting squad and replacements
@@ -41,6 +47,8 @@ The restrictions:
 * one of the starting players is a captain scoring 1.5 times the number of points
 * 6 total transfers can be made over the entire season
 
+## Some restrictions are more complicated to handle than others
+
 Of these restrictions the following are variable:
 
 * choice of captain
@@ -49,7 +57,7 @@ Of these restrictions the following are variable:
 
 Since complications arise out of those variable restrictions we won't focus on them in a preliminary analysis.
 
-# Most valuable players
+# Restrictions to focus on
 
 The restrictions make clear there are 3 main factors for us to take into account:
 
@@ -57,11 +65,35 @@ The restrictions make clear there are 3 main factors for us to take into account
 * position (max of x players in position y depending on formation)
 * club (max 2 players of the same team)
 
-The problem with the formations is they are not explicitly defined in the rules. The best way to find out what formations are possible is to have a look at the formations used by existing players.
+## Possible formations
 
-Regarding solutions, this looks like a lineair programming problem but let's first try to handle this manually.
+The problem with the formations is they are not explicitly defined in the rules. The best way to find out what formations are possible is to have a look at the formations used by existing users.
 
-## Focus on
+```{r frequency_graph_used_formations }
+ggplot(data = formations_used, aes(x = V1)) + geom_bar()
+```
+
+As the graph shows there are 6 possible formations:
+
+* 3-4-3
+* 3-5-2
+* 4-3-3
+* 4-4-2
+* 4-5-1
+* 5-3-2
+
+3-4-3 is clearly the most popular one with about half of the top 100 users using that formation. This might be a strong indication this is also the best formation.
+
+## Find the optimum
+
+Regarding solutions, this looks like a lineair programming problem but let's first try to handle this manually. We just select teams randomly and filter out those teams meeting our restrictions.
+
+
+# Finding the optimum through random selection of players
+
+
+
+# Most valuable players
 
 Only top 20 players within each position.
 
