@@ -18,6 +18,7 @@ rm(list = ls())
 # packages
 library(ggplot2)
 library(dplyr)
+library(purrr)
 library(ggpubr)
 
 # load data
@@ -31,7 +32,7 @@ players <- players %>%
   mutate(roi = points/value) # calculate roi
 ```
 
-# Restrictions
+# All restrictions
 
 ## How to score points
 
@@ -89,9 +90,90 @@ As the graph shows there are 6 possible formations:
 Regarding solutions, this looks like a lineair programming problem but let's first try to handle this manually. We just select teams randomly and filter out those teams meeting our restrictions.
 
 
-# Finding the optimum through random selection of players
+# Random selection of players
+
+Since the previous part showed the most used formation is 3-4-3 we'll select 1 keeper, 3 defenders, 4 midfielders and 3 attackers. We don't care about replacements so we just select 11 players. Let's select 1000 teams.
+
+```{r randomly_select_teams }
+nr_defenders <- 3
+nr_midfielders <- 4
+nr_attackers <- 3
+nr_teams <- 1000
+
+randomly_select_players <- function(nr_defenders, nr_midfielders, nr_attackers) {
+  # randomly select players
+  keeper <- players %>% filter(position_id == 1) %>% sample_n(1) # always select a keeper
+  defenders <- players %>% filter(position_id == 2) %>% sample_n(nr_defenders)
+  midfielders <- players %>% filter(position_id == 3) %>% sample_n(nr_midfielders)
+  attackers <- players %>% filter(position_id == 4) %>% sample_n(nr_attackers)
+  
+  # bind together
+  return(bind_rows(keeper, defenders, midfielders, attackers))
+} 
+
+random_teams <- replicate(nr_teams,
+                          randomly_select_players(nr_defenders,
+                                                  nr_midfielders,
+                                                  nr_attackers),
+                          simplify = FALSE)
+```
+
+Now we can check if each randomly selected team:
+
+* has a value less or equal than 250M
+* doesn't have more than 2 players of the same team
+
+```{r check_restrictions}
+assert_value_team_ok <- function(team) {
+  sum(team$value) <= 250
+}
+
+assert_max_players_by_club_ok <- function(team) {
+  all(table(team$club_id) <= 2)
+}
+
+filter_out_violating_team <- function(team) {
+  if (assert_value_team_ok(team) & assert_max_players_by_club_ok(team)) {
+    return(team)
+  }
+}
+
+correct_teams <- random_teams %>% map(filter_out_violating_team) %>% discard(is.null) # NULL is violating team
+```
 
 
+# Compare points random teams with teams by real users
+
+Let's see how well these random teams did compared to the teams selected by real users.
+
+Points random teams:
+
+```{r points_random_teams}
+calculate_total_points <- function(team) {
+  sum(team$points)
+}
+
+total_points_random_teams <- random_teams %>%
+  map_int(calculate_total_points) %>%
+  as.data.frame(.) %>% 
+  setNames(c("total_points")) 
+
+total_value_random_teams <- random_teams %>%
+  map_int(function(team) sum(team$value)) %>%
+  as.data.frame(.) %>% 
+  setNames(c("total_value")) 
+
+ggplot(data = total_points_random_teams,
+       aes(x = total_points)) +
+  geom_histogram()
+
+ggplot(data = total_value_random_teams,
+       aes(x = total_value)) +
+  geom_histogram()
+
+
+
+```
 
 # Most valuable players
 
