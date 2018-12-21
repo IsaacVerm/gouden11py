@@ -1,12 +1,18 @@
 SHELL := /bin/bash
 
-all: extract analyse
+all: install clean extract analyse
+
+install:
+	source ./virtualenv/bin/activate;\
+	pip install -r requirements.txt
+	Rscript -e "packrat::restore()"
 
 analyse:
 	Rscript -e "Sys.setenv(RSTUDIO_PANDOC='/Applications/RStudio.app/Contents/MacOS/pandoc');rmarkdown::render('./analysis/optimal_selection_players.Rmd')"
 
 clean:
 	rm -rf ./extract/csv/*
+	rm -rf ./analysis/optimal_selection_players.html
 
 extract: points_teams_top_users.csv formations_used_top_users.csv players.csv
 
