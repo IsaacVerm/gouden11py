@@ -7,9 +7,9 @@ editor_options:
 
 # Goal
 
-Find an optimal selection of players for Gouden 11. We'll have a look at the most valuable players and then see if these have any characteristics we can exploit. E.g. maybe all the most valuable players are in top teams, that would drastically reduce the number of options to choose from and make a selection strategy choosing players at random from top teams possible.
+Goals i to find an optimal selection of players for Gouden 11. We'll start with a strategy of randomly picking players and then try to improve on that strategy by having a look at the most valuable players and see if they have any characteristics we can exploit. E.g. maybe all the most valuable players are in top teams, that would drastically reduce the number of options to choose from and make a selection strategy choosing players at random from top teams possible.
 
-We'll also compare this optimal selection to the selection chosen by real users.
+We'll also compare our selections to the selections chosen by real users.
 
 ```{r setup}
 # clean environment
@@ -98,7 +98,7 @@ Since the previous part showed the most used formation is 3-4-3 we'll select 1 k
 nr_defenders <- 3
 nr_midfielders <- 4
 nr_attackers <- 3
-nr_teams <- 1000
+nr_teams <- 6000
 
 randomly_select_players <- function(nr_defenders, nr_midfielders, nr_attackers) {
   # randomly select players
@@ -158,22 +158,12 @@ total_points_random_teams <- random_teams %>%
   as.data.frame(.) %>% 
   setNames(c("total_points")) 
 
-total_value_random_teams <- random_teams %>%
-  map_int(function(team) sum(team$value)) %>%
-  as.data.frame(.) %>% 
-  setNames(c("total_value")) 
-
 ggplot(data = total_points_random_teams,
        aes(x = total_points)) +
   geom_histogram()
-
-ggplot(data = total_value_random_teams,
-       aes(x = total_value)) +
-  geom_histogram()
-
-
-
 ```
+
+Points teams selected by real users:
 
 # Most valuable players
 
