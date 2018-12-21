@@ -3,7 +3,7 @@ import csv
 
 # open csv to output to
 formations_used_output_file = open(
-    './gouden_11_requests/csv/formations_used_top_users.csv', 'w')
+    './extract/csv/formations_used_top_users.csv', 'w')
 formations_used_output_writer = csv.writer(formations_used_output_file)
 
 # get teams

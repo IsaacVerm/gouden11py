@@ -24,9 +24,9 @@ library(purrr)
 library(ggpubr)
 
 # load data
-players <- read.csv(file = "players.csv", as.is = (c("name")))
-formations_used <- read.csv(file = "formations_used_top_100_users.csv", header = FALSE)
-total_points_real_teams <- read.csv(file = "total_points_teams_top_100_users.csv")
+players <- read.csv(file = "../extract/csv/players.csv", as.is = (c("name")))
+formations_used <- read.csv(file = "../extract/csv/formations_used_top_users.csv", header = FALSE)
+total_points_real_teams <- read.csv(file = "../extract/csv/points_teams_top_users.csv")
 ```
 
 

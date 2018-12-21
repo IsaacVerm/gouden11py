@@ -6,7 +6,7 @@ players = requests.get(
     'https://goudenspelen.nanoapp.io/players.json?competition_feed=G11&season_id=2019&week_id=all').json()['Players']
 
 # open csv to output to
-players_output_file = open('./gouden_11_requests/csv/players.csv', 'w')
+players_output_file = open('./extract/csv/players.csv', 'w')
 players_output_writer = csv.writer(players_output_file)
 
 # write header to csv

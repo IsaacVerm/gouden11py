@@ -7,7 +7,7 @@ teams = requests.get(
 
 # open csv to output to
 points_by_team_output_file = open(
-    './gouden_11_requests/csv/points_teams_top_users.csv', 'w')
+    './extract/csv/points_teams_top_users.csv', 'w')
 points_by_team_output_writer = csv.writer(points_by_team_output_file)
 
 # write header to csv

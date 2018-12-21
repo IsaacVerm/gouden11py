@@ -1,6 +1,9 @@
 SHELL := /bin/bash
 
-data_pipeline: extract
+all: extract analyse
+
+analyse:
+	Rscript -e "Sys.setenv(RSTUDIO_PANDOC='/Applications/RStudio.app/Contents/MacOS/pandoc');rmarkdown::render('./analysis/optimal_selection_players.Rmd')"
 
 clean:
 	rm -rf ./extract/csv/*
