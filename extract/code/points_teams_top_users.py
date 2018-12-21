@@ -6,7 +6,8 @@ teams = requests.get(
     'https://goudenspelen.nanoapp.io/rankings.json?competition_feed=G11&limit=100&page=1&search_query=&season_id=2019&type=general').json()['Teams']
 
 # open csv to output to
-points_by_team_output_file = open('total_points_teams_top_100_users.csv', 'w')
+points_by_team_output_file = open(
+    './gouden_11_requests/csv/points_teams_top_users.csv', 'w')
 points_by_team_output_writer = csv.writer(points_by_team_output_file)
 
 # write header to csv
