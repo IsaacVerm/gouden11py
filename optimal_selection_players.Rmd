@@ -24,6 +24,7 @@ library(ggpubr)
 # load data
 players <- read.csv(file = "players.csv", as.is = (c("name")))
 formations_used <- read.csv(file = "formations_used_top_100_users.csv", header = FALSE)
+total_points_real_teams <- read.csv(file = "total_points_teams_top_100_users.csv")
 ```
 
 
@@ -146,26 +147,30 @@ correct_teams <- random_teams %>% map(filter_out_violating_team) %>% discard(is.
 
 Let's see how well these random teams did compared to the teams selected by real users.
 
-Points random teams:
-
-```{r points_random_teams}
+```{r points_random_teams_vs_real_teams}
 calculate_total_points <- function(team) {
   sum(team$points)
 }
 
-total_points_random_teams <- random_teams %>%
+total_points_random_teams <- correct_teams %>%
   map_int(calculate_total_points) %>%
   as.data.frame(.) %>% 
-  setNames(c("total_points")) 
+  setNames(c("points")) %>% 
+  mutate(type_of_team = "random")
 
-ggplot(data = total_points_random_teams,
-       aes(x = total_points)) +
-  geom_histogram()
+total_points_teams <- bind_rows(total_points_random_teams,
+                                total_points_real_teams %>%
+                                  mutate(type_of_team = "real") %>%
+                                  select(points, type_of_team))
+
+ggplot(data = total_points_teams,
+       aes(x = points, colour = type_of_team)) +
+  geom_freqpoly()
 ```
 
-Points teams selected by real users:
+It's clear there's almost no overlap between the random teams and real teams. This means we'll have to improve on our strategy. A good way to start is by looking at what players have a high return on investment (points/value) and see if they belong to specific clubs.
 
-# Most valuable players
+# What are valuable players
 
 Only top 20 players within each position.
 
