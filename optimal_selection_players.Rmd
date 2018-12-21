@@ -1,7 +1,9 @@
 ---
 title: "Optimal selection players Gouden 11"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -93,7 +95,7 @@ Regarding solutions, this looks like a lineair programming problem but let's fir
 
 # Random selection of players
 
-Since the previous part showed the most used formation is 3-4-3 we'll select 1 keeper, 3 defenders, 4 midfielders and 3 attackers. We don't care about replacements so we just select 11 players. Let's select 1000 teams.
+Since the previous part showed the most used formation is 3-4-3 we'll select 1 keeper, 3 defenders, 4 midfielders and 3 attackers. We don't care about replacements so we just select 11 players. Let's select 6000 teams.
 
 ```{r randomly_select_teams }
 nr_defenders <- 3
@@ -101,19 +103,20 @@ nr_midfielders <- 4
 nr_attackers <- 3
 nr_teams <- 6000
 
-randomly_select_players <- function(nr_defenders, nr_midfielders, nr_attackers) {
+randomly_select_players <- function(players_df, nr_defenders, nr_midfielders, nr_attackers) {
   # randomly select players
-  keeper <- players %>% filter(position_id == 1) %>% sample_n(1) # always select a keeper
-  defenders <- players %>% filter(position_id == 2) %>% sample_n(nr_defenders)
-  midfielders <- players %>% filter(position_id == 3) %>% sample_n(nr_midfielders)
-  attackers <- players %>% filter(position_id == 4) %>% sample_n(nr_attackers)
+  keeper <- players_df %>% filter(position_id == 1) %>% sample_n(1) # always select a keeper
+  defenders <- players_df %>% filter(position_id == 2) %>% sample_n(nr_defenders)
+  midfielders <- players_df %>% filter(position_id == 3) %>% sample_n(nr_midfielders)
+  attackers <- players_df %>% filter(position_id == 4) %>% sample_n(nr_attackers)
   
   # bind together
   return(bind_rows(keeper, defenders, midfielders, attackers))
 } 
 
 random_teams <- replicate(nr_teams,
-                          randomly_select_players(nr_defenders,
+                          randomly_select_players(players,
+                                                  nr_defenders,
                                                   nr_midfielders,
                                                   nr_attackers),
                           simplify = FALSE)
@@ -170,25 +173,67 @@ ggplot(data = total_points_teams,
 
 It's clear there's almost no overlap between the random teams and real teams. This means we'll have to improve on our strategy. A good way to start is by looking at what players have a high return on investment (points/value) and see if they belong to specific clubs.
 
-# What are valuable players
+# What are the valuable players?
 
-Only top 20 players within each position.
+Let's plot the roi for the top 50 players with the hightest roi and see to what teams they belong.
 
 ```{r}
-top_20_players <- players %>%
-  group_by(position_id) %>% # group id has to be calculated by position
-  arrange(desc(roi)) %>% 
-  top_n(20, roi) %>% # only interested in top 20 players by position
-  mutate(group_id = 1:n()) # add unique id within each group of positions
+top_50_players <- players %>%
+  top_n(50, roi)
 
-ggplot(data = top_20_players,
-       aes(x = group_id,
+ggplot(data = top_50_players,
+       aes(x = reorder(name, -roi),
            y = roi,
            fill = club_name)) +
   geom_col() +
   ggpubr::rremove("x.text") +
-  ggpubr::rremove("x.title") +
-  facet_grid(. ~ position_id)
+  ggpubr::rremove("x.title")
   
 ```
 
+It seems all the most valued players are in teams that have a good spot in the league table. If we can predict at the beginning of the season what teams will be high in the league table we can seriously limit our selection. STVV and Antwerp are the odd ones here and would be difficult to predict beforehand. On the other hand Anderlecht, Club Brugge,... are the usual suspects.
+
+# Random selection of players within top teams last season
+
+Let's redo the picking of players but this time we only keep players of one of the 6 most high ranking teams in our starting players data set. So we'll pick 2 players from the teams with rank 1 to 5 and 1 player of the team with rank 6.
+
+This is the final league of the season 2017-2018:
+
+1. Club Brugge
+2. Standard de Liège
+3. Anderlecht
+4. Gent
+5. Genk
+6. Charleroi
+
+```{r randomly_select_from_top_teams}
+players_top_teams <- players %>% filter(club_name %in% c("Club Brugge KV",
+                                                         "Standard Li\303\250ge",
+                                                         "Anderlecht",
+                                                         "AA Gent",
+                                                         "Racing Genk",
+                                                         "Charleroi"))
+
+random_top_teams <- replicate(20000,
+                          randomly_select_players(players_top_teams,
+                                                  nr_defenders,
+                                                  nr_midfielders,
+                                                  nr_attackers),
+                          simplify = FALSE)
+
+random_top_teams <- random_top_teams %>% map(filter_out_violating_team) %>% discard(is.null)
+
+total_points_random_top_teams <- random_top_teams %>%
+  map_int(calculate_total_points) %>%
+  as.data.frame(.) %>% 
+  setNames(c("points"))
+
+ggplot(data = total_points_teams,
+       aes(x = points)) +
+  geom_histogram()
+
+```
+
+We randomly select 20000 teams of which 482 are valid. We can see a substantial amount of these teams earn more than 400 points which would certainly put them in the top 100 best teams.
+
+Now let's have a look what players were selected in our selections earning more than 400 points.

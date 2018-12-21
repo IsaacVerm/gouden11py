@@ -8,3 +8,5 @@ packrat*
 !packrat.lock
 packrat/lib*/
 .Rhistory
+*.png
+*.nb.html
