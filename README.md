@@ -1,12 +1,21 @@
 # Goal
 
-- find out what are the most valuable players
-- compare the points scored by the best team possible with teams found in the wild
-- see what players are used by top ranking users
+Find an optimal selection of players for Gouden 11.
 
-# Python
+# Makefile
 
-To setup the environment create a virtual enviroment first.
+The Makefile takes care of the orchestration of the files:
+
+- install (dependencies)
+- clean (remove any pre-existing data)
+- extract (make requests to Gouden 11 and save to file)
+- analysis (run the notebook)
+
+In case anything goes wrong during the installation, below are the instructions how to manually install the dependencies.
+
+## Python
+
+To setup the environment create a virtual environment first.
 
 `python3 -m venv whatever`
 
@@ -20,7 +29,7 @@ Install the packages required as defined in requirements.txt
 
 The files to run are just separate scripts.
 
-# R
+## R
 
 In Python we used venv to handle packages, in R we use packrat.
 

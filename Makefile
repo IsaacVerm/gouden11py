@@ -3,6 +3,7 @@ SHELL := /bin/bash
 all: install clean extract analyse
 
 install:
+	python3 -m venv virtualenv
 	source ./virtualenv/bin/activate;\
 	pip install -r requirements.txt
 	Rscript -e "packrat::restore()"

@@ -9,7 +9,7 @@ editor_options:
 
 # Goal
 
-Goals i to find an optimal selection of players for Gouden 11. We'll start with a strategy of randomly picking players and then try to improve on that strategy by having a look at the most valuable players and see if they have any characteristics we can exploit. E.g. maybe all the most valuable players are in top teams, that would drastically reduce the number of options to choose from and make a selection strategy choosing players at random from top teams possible.
+Goal is to find an optimal selection of players for Gouden 11. We'll start with a strategy of randomly picking players and then try to improve on that strategy by having a look at the most valuable players and see if they have any characteristics we can exploit. E.g. maybe all the most valuable players are in top teams, that would drastically reduce the number of options to choose from and make a selection strategy choosing players at random from top teams possible.
 
 We'll also compare our selections to the selections chosen by real users.
 
