@@ -97,10 +97,10 @@ Regarding solutions, this looks like a lineair programming problem but let's fir
 
 # Random selection of players
 
-Since the previous part showed the most used formation is 3-4-3 we'll select 1 keeper, 3 defenders, 4 midfielders and 3 attackers. We don't care about replacements so we just select 11 players. Let's select 1000 teams.
+Since the previous part showed the most used formation is 3-4-3 we'll select 1 keeper, 3 defenders, 4 midfielders and 3 attackers. We don't care about replacements so we just select 11 players. Let's select 10000 teams.
 
 ```{r randomly_select_teams }
-random_teams_all_players <- replicate(1000,
+random_teams_all_players <- replicate(10000,
                                       randomly_select_players(players,3,4,3),
                                       simplify = FALSE)
 ```
@@ -119,7 +119,7 @@ random_teams_all_players <- random_teams_all_players %>% # overwrite to save mem
 
 # Compare total points random teams with teams by real users
 
-Let's see how well these random teams did compared to the teams selected by real users.
+Let's see how well these random teams did compared to the teams selected by real users. We randomly select a captain as well.
 
 ```{r points_random_teams_vs_real_teams}
 total_points_random_teams <- calculate_total_points_teams(random_teams_all_players) %>%
@@ -181,7 +181,7 @@ players_top_teams <- players %>% filter(club_name %in% c("Club Brugge KV",
                                                          "Charleroi"))
 
 # select random teams
-random_teams_top_players <- replicate(100000,
+random_teams_top_players <- replicate(10000,
                                       randomly_select_players(players_top_teams,
                                                               3,
                                                               4,
@@ -200,9 +200,15 @@ ggplot(data = total_points_random_teams_top_players,
 
 ```
 
-We randomly select 100000 teams of which roughly 500 are valid. We can see a substantial amount of these teams earn more than 400 points which would certainly put them in the top 100 best teams.
+We randomly select 10000 teams of which roughly 250 are valid. Unfortunately, our highest ranking team scores less than 400 points which would obtain around place 100.
 
+# Conclusion
 
-# Number of teams necessary to obtain first place
+It doesn't seem to be possible to get at least a high ranking team using the strategy described above. However, we didn't take advantage of the following:
 
-Now exactly how many teams do we need to obtain the first place with a certain reliability? 
+* alternative formations
+* replacement players
+* transfers
+* selecting a captain
+
+By manually making replacements and transfers at the right time and selecting a captain you'd probably get more points.
